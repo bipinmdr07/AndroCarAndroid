@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="8dp">
+
+<!--    <Button
+        android:id="@+id/leftBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="58dp"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
+        android:text="Left" />
+
+    <Button
+        android:id="@+id/rightBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/leftBtn"
+        android:layout_marginLeft="47dp"
+        android:layout_marginStart="47dp"
+        android:layout_toEndOf="@+id/leftBtn"
+        android:layout_toRightOf="@+id/leftBtn"
+        android:text="Right" />
+
+    <Button
+        android:id="@+id/forwardBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/rightBtn"
+        android:layout_marginLeft="115dp"
+        android:layout_marginStart="115dp"
+        android:layout_toEndOf="@+id/rightBtn"
+        android:layout_toRightOf="@+id/rightBtn"
+        android:text="Forward" />
+
+    <Button
+        android:id="@+id/backwardBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/forwardBtn"
+        android:layout_marginEnd="18dp"
+        android:layout_marginRight="18dp"
+        android:text="Backward" />
+
+    <Button
+        android:id="@+id/headlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/forwardBtn"
+        android:layout_marginBottom="63dp"
+        android:layout_toEndOf="@+id/forwardBtn"
+        android:layout_toRightOf="@+id/forwardBtn"
+        android:text="Button"
+        tools:text="Head Light" />
+
+    <Button
+        android:id="@+id/rearlight"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/leftBtn"
+        android:layout_alignStart="@+id/leftBtn"
+        android:layout_alignTop="@+id/headlight"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="14dp"
+        android:text="Rear light" />-->
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"
+        android:text="Andro Car" />
+
+    <ImageView
+        android:id="@+id/Right_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/forward_btnn"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"/>
+
+    <ImageView
+        android:id="@+id/rearLight_btnn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/rear_light_off"></ImageView>
+
+    <ImageView
+        android:id="@+id/headLight_btnn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/head_light_off"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"></ImageView>
+
+    <ImageView
+        android:id="@+id/Left_Btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/backward_btn"
+        android:layout_centerVertical="true"/>
+
+    <ImageView
+        android:id="@+id/horn_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/horn"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"></ImageView>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="Status"
+        android:textSize="24sp"/>
+</RelativeLayout>
