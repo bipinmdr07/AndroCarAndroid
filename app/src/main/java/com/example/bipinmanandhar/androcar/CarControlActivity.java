@@ -23,6 +23,9 @@ import android.hardware.SensorManager;
 
 import java.io.IOException;
 import java.util.UUID;
+import android.os.Handler;
+
+import static android.graphics.Color.RED;
 
 /**
  * Created by Bipin Manandhar on 6/26/2017.
@@ -58,6 +61,13 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
 
     // for debugging
     private static final String TAG = "CarControlActivity";
+    private int obstacleMessage = 0;
+
+    byte[] readBuffer;
+    volatile boolean stopWorker;
+    int counter;
+    int readBufferPosition;
+    Thread workerThread;
 
     @Override
     public void onCreate( Bundle savedInstanceState) {
@@ -90,9 +100,9 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
         mySensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         // register sensor listener
-        manager.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_NORMAL);
+        manager.registerListener(this, mySensor, SensorManager.SENSOR_DELAY_FASTEST);
 
-        // init accelometer textview
+        // init accelerometer textview
         myTV = (TextView) findViewById(R.id.textView);
 
         new ConnectBT().execute();
@@ -116,13 +126,6 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                try {
-                    Thread.sleep(50);
-                }
-                catch(InterruptedException e){
-
-                }
-
                 switch(motionEvent.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         forwardBtnnHold = true;
@@ -139,6 +142,7 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
                     case  MotionEvent.ACTION_UP:
                         forwardBtnnHold = false;
                         sendData("0");
+                        latestSentData = 0;
                         break;
                 }
 
@@ -165,13 +169,6 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-//                try {
-//                    Thread.sleep(50);
-//                }
-//                catch(InterruptedException e){
-//
-//                }
-
                 switch(motionEvent.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         backwardBtnnHold = true;
@@ -188,6 +185,7 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
                     case MotionEvent.ACTION_UP:
                         backwardBtnnHold = false;
                         sendData("0");
+                        latestSentData = 0;
                         break;
                 }
                 return true;
@@ -274,77 +272,105 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        myTV.setText("X: " + java.lang.Math.floor(sensorEvent.values[0])
-                    + "\nY: " + java.lang.Math.floor(sensorEvent.values[1])
-                    + "\nZ: " + java.lang.Math.floor(sensorEvent.values[2]));
+//        myTV.setText("X: " + java.lang.Math.floor(sensorEvent.values[0])
+//                    + "\nY: " + java.lang.Math.floor(sensorEvent.values[1])
+//                    + "\nZ: " + java.lang.Math.floor(sensorEvent.values[2]));
+
+//        receiveData();
 
         if (java.lang.Math.floor(sensorEvent.values[1]) >= 5){
             readyForRightTurn = true;
             if (forwardBtnnHold && latestSentData != 3){
                 sendData("3");
                 latestSentData = 3;
+//                Toast.makeText(getApplicationContext(), "right", Toast.LENGTH_SHORT).show();
             }
             else if (backwardBtnnHold && latestSentData != 5){
                 sendData("5");
                 latestSentData = 5;
+//                Toast.makeText(getApplicationContext(), " back right", Toast.LENGTH_SHORT).show();
             }
-//            if (btSocket != null){
-//                try {
-//                    btSocket.getOutputStream().write("3".toString().getBytes());
-//                }
-//                catch (IOException e){
-//                    Log.v(TAG, "right accelerometer");
-//                    msg("ERROR");
-//                }
-//            }
         }
         else if (java.lang.Math.floor(sensorEvent.values[1]) <= -5){
             readyForLeftTurn = true;
             if (forwardBtnnHold && latestSentData != 4){
                 sendData("4");
                 latestSentData = 4;
+//                Toast.makeText(getApplicationContext(), "left", Toast.LENGTH_SHORT).show();
             }
 
             else if (backwardBtnnHold && latestSentData != 6){
                 sendData("6");
                 latestSentData = 6;
+//                Toast.makeText(getApplicationContext(), "left back", Toast.LENGTH_SHORT).show();
             }
-//            if (btSocket != null){
-//                try {
-//                    btSocket.getOutputStream().write("4".toString().getBytes());
-//                }
-//                catch (IOException e){
-//                    Log.v(TAG, "left accelerometer");
-//                    msg("ERROR");
-//                }
-//            }
         }
         else {
-            readyForRightTurn = false;
-            readyForLeftTurn = false;
 
             if (forwardBtnnHold && latestSentData != 1){
                 sendData("1");
                 latestSentData = 1;
+//                Toast.makeText(getApplicationContext(), "forward", Toast.LENGTH_SHORT).show();
             }
             else if (backwardBtnnHold && latestSentData != 2){
                 sendData("2");
                 latestSentData = 2;
+//                Toast.makeText(getApplicationContext(), "backward", Toast.LENGTH_SHORT).show();
             }
-//            if (btSocket != null){
-//                try {
-//                    btSocket.getOutputStream().write("0".toString().getBytes());
-//                }
-//                catch (IOException e){
-//                    msg("ERROR");
-//                }
-//            }
         }
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int i) {
         // not necessory for now
+    }
+
+    // method for handling the Serial data from arduino to android
+    void listenForData(){
+        final Handler handler = new Handler();
+        final byte delimiter = 10; // ASCII code for newline character
+
+        stopWorker = false;
+        readBufferPosition = 0;
+        readBuffer = new byte[1024];
+        workerThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!Thread.currentThread().isInterrupted() && !stopWorker){
+                    try {
+                        int bytesAvailable = btSocket.getInputStream().available();
+                        if (bytesAvailable > 0){
+                            byte[] packetBytes = new byte[bytesAvailable];
+                            btSocket.getInputStream().read(packetBytes);
+                            for(int i=0; i<bytesAvailable; i++){
+                                byte b = packetBytes[i];
+                                if(b == delimiter){
+                                    byte[] encodedBytes = new byte[readBufferPosition];
+                                    System.arraycopy(readBuffer, 0, encodedBytes, 0, encodedBytes.length);
+                                    final String data = new String(encodedBytes);
+                                    readBufferPosition = 0;
+
+                                    handler.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            myTV.setText(data);
+                                            myTV.setTextColor(RED);
+                                        }
+                                    });
+                                }
+                                else {
+                                    readBuffer[readBufferPosition++] = b;
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException ex){
+                        stopWorker = true;
+                    }
+                }
+            }
+        });
+        workerThread.start();
     }
 
     private class ConnectBT extends AsyncTask<Void, Void, Void>
@@ -388,6 +414,7 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
             else {
                 msg("Connected.");
                 isBtConnected = true;
+                listenForData();
             }
         }
     }
