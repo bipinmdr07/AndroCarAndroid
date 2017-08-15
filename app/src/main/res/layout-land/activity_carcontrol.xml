@@ -86,7 +86,7 @@
         android:id="@+id/Right_Btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/forward_btnn"
+        android:src="@drawable/forward_btn_idle"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"/>
@@ -109,7 +109,7 @@
         android:id="@+id/Left_Btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/backward_btn"
+        android:src="@drawable/backward_btn_idle"
         android:layout_centerVertical="true"/>
 
     <ImageView
@@ -126,6 +126,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="Status"
+        android:text="Tilt your phone for turning"
         android:textSize="24sp"/>
 </RelativeLayout>
