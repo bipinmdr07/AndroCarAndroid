@@ -116,7 +116,7 @@
         android:id="@+id/horn_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/horn"
+        android:src="@drawable/horn0"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"></ImageView>
 

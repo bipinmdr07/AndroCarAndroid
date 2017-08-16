@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -45,7 +46,8 @@ import static android.graphics.Color.RED;
  * 0 to stop the car
  */
 
-public class CarControlActivity extends AppCompatActivity implements SensorEventListener {
+public class
+CarControlActivity extends AppCompatActivity implements SensorEventListener {
     // imageView for buttons used in the interface for good apperance
     ImageView forwardBtnn, backwardBtnn,hornBtnn,headlightBtnn,rearlightBtnn;
     // this variable is for storing the address of bluetooth model we are connected to.
@@ -69,6 +71,8 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
 
     // Text view for displaying the error message on obstacle detection
     private TextView myTV;
+
+    int i = 1;
 
     // Sensor components
     private Sensor mySensor;
@@ -97,6 +101,8 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
         // creating Intent for receiving the data passed from previous activity.
         // in this case the bluetooth model address
         Intent newint = getIntent();
+
+        final Handler handler = new Handler();
 
         // receive the address of the bluetooth device using newint Intent
         address = newint.getStringExtra(MainActivity.EXTRA_ADDRESS);
@@ -224,6 +230,19 @@ public class CarControlActivity extends AppCompatActivity implements SensorEvent
             @Override
             public void onClick(View view) {
                 sendData("9");
+                new CountDownTimer(1800, 200) {
+
+                    public void onTick(long millisUntilFinished) {
+                        i = i % 4;
+                        hornBtnn.setImageResource(R.drawable.horn + i);
+                        i += 1;
+                    }
+
+                    public void onFinish() {
+                        i = 1;
+                        hornBtnn.setImageResource(R.drawable.horn0);
+                    }
+                }.start();
             }
         });
     }
